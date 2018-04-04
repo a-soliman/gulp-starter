@@ -5,7 +5,9 @@ const gulpCopy		= require('gulp-copy');
 const plumber		= require('gulp-plumber');
 const sass 			= require('gulp-sass');
 const uglify 		= require('gulp-uglify');
+const babel			= require('gulp-babel');
 const watch 		= require('gulp-watch');
+const concat		= require('gulp-concat');
 const minifyCss		= require('gulp-minify-css');
 const autoprefixer	= require('gulp-autoprefixer');
 const livereload	= require('gulp-livereload');
@@ -13,7 +15,7 @@ const soursemaps	= require('gulp-sourcemaps');
 
 // FILE PATH
 const _scripts_path = 'src/js/**/*.js';
-const _HTML_path 	= 'src/**/*.html';
+const _HTML_path 	= 'src/index.html';
 const _sass_path	= 'src/scss/**/*.scss'
 const _dist_path	= 'dist/'			
 
@@ -50,9 +52,20 @@ gulp.task('sass:watch', () => {
 gulp.task('scripts', () => {
 	console.log('Starting SCRIPTS task')
 	return gulp.src(_scripts_path)
+		.pipe(plumber( function(err) {
+			console.log('SCRIPTS task error');
+			console.log(err);
+			this.emit('end')
+		}))
+		.pipe(soursemaps.init())
+		.pipe(babel({
+			presets: ['es2015']
+		}))
 		.pipe(uglify().on('error', (e) => {
 			console.log(e)
 		}))
+		.pipe(concat('main.js'))
+		.pipe(soursemaps.write())
 		.pipe(gulp.dest('dist/js'))
 		.pipe(livereload())
 })
@@ -64,7 +77,7 @@ gulp.task('default', ['copy', 'scripts', 'sass'],() => {
 gulp.task('server', ['default'],() => {
 	console.log('Starting WATCH task')
 	require('./server.js')
-	livereload.listen();
+	livereload.listen(35729);
 	gulp.watch(_HTML_path, ['copy'])
 	gulp.watch(_scripts_path, ['scripts'])
 	gulp.watch(_sass_path, ['sass'])
