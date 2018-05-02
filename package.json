@@ -1,9 +1,11 @@
 {
-  "name": "Gulp Starter",
+  "name": "Gulp-Starter",
   "version": "1.0.0",
   "description": "Gulp Starter with Bootstrap4, babel, sass, source mapping, font-awesome, jquery",
   "main": "app.js",
   "scripts": {
+    "start": "gulp server",
+    "build": "gulp",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Ahmed Soliman",
